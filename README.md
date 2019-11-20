@@ -16,6 +16,9 @@ played this a lot as I was making it - way more than I ever played the ZX
 Spectrum version.
 
 There's a video of the game on YouTube at https://youtu.be/ZruQWIdOD2c
+There's also a Pseudo Technical Overview at https://youtu.be/iPIi9rvafF8 (23 
+minutes long and I'll admit not the most riveting video on YouTube, but it does
+explain how this all works at a high level)
 
 2. CURRENT STATUS
 
@@ -46,7 +49,7 @@ colors at any one time.  The one exception is the intro logo.  That is done as
 a 4 bpp image, since it has more than 4 colors.
 
 There's really nothing fancy going on.  With 2 bpp there are 80 bytes across
-for a resolution of 160 pixels in width.  Each byte represents a column which
+for a resolution of 320 pixels in width.  Each byte represents a column which
 suits this game like a glove, since it scrolls by 4 pixels at a time, in other
 words, by 1 byte at a time.  There's no need to OR in the second column with
 the 1st column as it would have had to be done on the ZX Spectrum.
