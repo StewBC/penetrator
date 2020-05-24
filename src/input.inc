@@ -22,8 +22,7 @@
     jmp chkPause                                ; when paused - only process the pause key
 
 noPause:
-    jsr GETJOY
-    lda JOY1
+    jsr JOYGET
 	sta zaRawInput                              ; save the input
     eor #$ff                                    ; invert the bits
     sta zaRawEor                                ; save this state too
@@ -201,8 +200,8 @@ chkPause:
     rawEor    = tempBlock + 5
     brushType = tempBlock + 6
 
-    jsr GETJOY
-    lda JOY1
+    lda #0                                      ; Only first Joystick
+    jsr JOYGET
     sta rawInput                                ; save the input state
     eor #$ff                                    ; invert the bits so 1 means button down
     sta rawEor                                  ; save the inverted bits
@@ -305,8 +304,7 @@ joyDone:
 
     jsr GETIN                                   ; read the keyboard
     bne done                                    ; if there's a key then done here
-    jsr GETJOY                                  ; check the joystick
-    lda JOY1
+    jsr JOYGET                                  ; check the joystick
     sta rawInput                                ; keep the raw bits
     eor #$ff                                    ; invert
     and lastInput                               ; debounce
@@ -327,4 +325,3 @@ done:
     rts                                         ; upon return 0 means no interaction, anything else is a user input
 
 .endproc
-

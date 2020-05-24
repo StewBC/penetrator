@@ -107,7 +107,8 @@ win:
 
     jsr drawClearScreen                         ; make sure the screen is clear before adjusting the
 
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_GAME  ; make the screen shorter to be more spectrum-like for gameplay
+    lda #VSCALE_GAME                            ; make the screen shorter to be more spectrum-like for gameplay
+    sta VERA::DISP::VSCALE
 
     lda #NUM_LIVES                              ; lives to start
     sta lives

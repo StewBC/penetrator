@@ -149,7 +149,7 @@ szHex:            .asciiz "  "
     zaFontOffset = zTemp6                       ; 0-15 - index from zaFont
  
     lda #$10                                    ; stride of 1
-    sta VERA_ADDR_HI
+    sta VERA::ADDR + 2                          ; HI
 
 loop:
     ldy #0
@@ -167,19 +167,19 @@ plotLoop:
     ldy yPos                                    ; at the working row offset
     lda rowL, y                                 ; get the memory address
     adc textX                                   ; add in column (x pos of text)
-    sta VERA_ADDR_LO                            ; point vera at memory
+    sta VERA::ADDR                              ; point vera at memory
     lda rowH, y
     adc layersH, x
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
 
     ldy zaFontOffset                            ; get the offset into the font
     lda (zaFontL), y                            ; get the actual left character byte
     and zaFontMask                              ; mask for color
-    sta VERA_DATA0                              ; plot the left hand side
+    sta VERA::DATA0                             ; plot the left hand side
     iny                                         ; go to next byte (right hand side of character)
     lda (zaFontL), y 
     and zaFontMask
-    sta VERA_DATA0
+    sta VERA::DATA0
     cpy #15                                     ; characters are 16 bytes long
     bcs nextChar                                ; if 16 then done with this character
     inc zaFontOffset                            ; move 2 bytes for last row plotted

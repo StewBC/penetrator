@@ -59,7 +59,7 @@ dataLogoLinesEnd:
 ; Graphical logo, 3-byte encoded.  The encoding is simple:
 ; first byte is a nibble based count and 2nd and 3rd are values.  For example
 ; 0x12 0x34 0x56 would decode to 0x34 0x56 0x56
-; The first bytes is used as 2 nibbles that are the counts for bytes 2 and 3,
+; The first byte is used as 2 nibbles that are the counts for bytes 2 and 3,
 ; so in the example it says byte 2 occurs 1 time and byte 3 occurs 2 times.
 ; This does mean the maximum run per nibble is 15 so anything over 30 length
 ; would encode with a count of 0xFF and then the same value twice and this
@@ -1034,4 +1034,5 @@ logoStart:
 .byte $19, $01, $11, $11, $16, $11, $19, $61, $11
 .byte $11, $61, $16, $11, $11, $66, $19, $61, $11
 .byte $1E, $00, $11, $1A, $00, $11, $C1, $66, $61
+.byte $30, $66, $00
 logoEnd:

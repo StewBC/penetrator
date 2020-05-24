@@ -6,56 +6,6 @@
 ; This is free and unencumbered software released into the public domain.
 
 ;-----------------------------------------------------------------------------
-.macro vpokex  argx, argy
-
-    .if .paramcount <> 2
-    .error "Parameters issue for macro vpokex"
-    .endif
-
-    lda VERA_ADDR_HI
-    and $f0
-    ora #(argx)
-    sta VERA_ADDR_HI
-    lda #>(argy)
-    sta VERA_ADDR_MID
-    lda #<(argy)
-    sta VERA_ADDR_LO
-    stx VERA_DATA0
-
-.endmacro
-
-;-----------------------------------------------------------------------------
-.macro vpoke  argx, argy, argz
-
-    .if .paramcount <> 3
-    .error "Parameters issue for macro vpoke"
-    .endif
-
-    ldx #(argz) 
-    vpokex (argx), (argy)
-
-.endmacro
-
-;-----------------------------------------------------------------------------
-.macro vpeek  argx, argy
-
-    .if .paramcount <> 2
-    .error "Parameters issue for macro vpeek"
-    .endif
-
-    lda VERA_ADDR_HI
-    and $f0
-    ora #(argx)
-    sta VERA_ADDR_HI
-    lda #>(argy)
-    sta VERA_ADDR_MID
-    lda #<(argy)
-    sta VERA_ADDR_LO
-    lda VERA_DATA0
-
-.endmacro
-
-;-----------------------------------------------------------------------------
 .macro printZAStr sx, sy, mask
 
     .if .paramcount <> 3

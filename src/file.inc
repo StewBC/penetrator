@@ -19,7 +19,7 @@
     ldy #>textFileName
     jsr SETNAM
     lda #$00                                    ; logical number
-    ldx #$01                                    ; device 1
+    ldx #$08                                    ; device 8
     ldy #$01                                    ; secondary address
     jsr SETLFS
 
@@ -44,7 +44,7 @@
     ldy #>textFileName
     jsr SETNAM
     lda #$00                                    ; logical number
-    ldx #$01                                    ; device 1
+    ldx #$08                                    ; device 8
     ldy #$01                                    ; secondary address
     jsr SETLFS 
     ldx #<worldDataStart

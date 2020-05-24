@@ -12,7 +12,8 @@
 ;-----------------------------------------------------------------------------
 .proc uiTitleScreen 
 
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_UI    ; make the screen taller (fit more text and font looks nicer)
+    lda #VSCALE_UI                              ; make the screen taller (fit more text and font looks nicer)
+    sta VERA::DISP::VSCALE
 
     lda #0
     sta NDX                                     ; flush the keyboard buffer before uiWriteName
@@ -320,7 +321,8 @@ plot:
 
     jsr drawClearScreen
 
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_UI    ; make the screen bigger for UI - the font looks better
+    lda #VSCALE_UI                              ; make the screen bigger for UI - the font looks better
+    sta VERA::DISP::VSCALE
 
     print textInstructions, #(2*14), #(8*04), #$FF
     print textPress       , #(2*17), #(8*08), #$FF
@@ -331,15 +333,12 @@ plot:
     print textLoad        , #(2*05), #(8*14), #$FF
     print textSirens      , #(2*09), #(8*15), #$55
 
-; lda JOY1 + 2 joystick detection code appears not to work?
-; bmi :+
-
     print textJoyhead     , #(2*14), #(8*19), #$FF
     print textJoyheadLine , #(2*14), #(8*20), #$FF
     print textJoy1        , #(2*08), #(8*22), #$FF
     print textJoy2        , #(2*13), #(8*23), #$FF
     print textJoy3        , #(2*11), #(8*24), #$FF
-; :
+
     print textNotDone     , #(2*12), #(8*28), #$55
 
     jsr drawPresent
@@ -496,7 +495,8 @@ done:
 
     jsr drawClearScreen                         ; clear the screen
 
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_UI    ; UI scale for nice font
+    lda #VSCALE_UI                              ; UI scale for nice font
+    sta VERA::DISP::VSCALE
 
     print textEdtHlp01, #(2*08), #(8*00), #$ff  ; show all the help text
     print textEdtHlp02, #(2*08), #(8*01), #$ff
@@ -524,7 +524,8 @@ done:
 
     jsr drawClearScreen                         ; clear the screen
 
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_GAME  ; back to game scale
+    lda #VSCALE_GAME                            ; back to game scale
+    sta VERA::DISP::VSCALE
 
     lda #2                                      ; and force a
     sta updateHUD                               ; HUD update
@@ -543,7 +544,8 @@ done:
 
     jsr drawClearScreen
 
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_UI    ; Get the taller screen
+    lda #VSCALE_UI                              ; Get the taller screen
+    sta VERA::DISP::VSCALE
 
     lda #8                                      ; init the counters - value
     sta cntrh                                   ; not important what these are init with
@@ -596,7 +598,8 @@ loop:
     bcc loop
 
 done:
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_UI    ; Back to the shorter screen
+    lda #VSCALE_UI                              ; Back to the shorter screen
+    sta VERA::DISP::VSCALE
 
     rts
 
@@ -836,7 +839,8 @@ nameLoop:
     textLen  = tempBlock + 12                   ; how many characters the player may enter with uiGetUserText
 
     jsr drawClearScreen
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_UI    ; set the screen to the nicer font size
+    lda #VSCALE_UI                              ; set the screen to the nicer font size
+    sta VERA::DISP::VSCALE
 
     ldy #8                                      ; UI palette is 8 bytes long
     lda #UI_PALETTE
@@ -890,7 +894,8 @@ enter:
 done:
     jsr drawClearScreen
 
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_GAME  ; set the screen back to in-game size for 2 player games
+    lda #VSCALE_GAME                            ; set the screen back to in-game size for 2 player games
+    sta VERA::DISP::VSCALE
 
     rts 
 
@@ -914,9 +919,10 @@ done:
     sta forLoad
     jsr drawClearScreen
 
-    vpeek VERA_regs_hi, DC_VSCALE               ; see what scale is in effect and save it
+    lda VERA::DISP::VSCALE                      ; see what scale is in effect and save it
     sta scale
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_UI    ; set the screen to the nicer font size
+    lda #VSCALE_UI                              ; set the screen to the nicer font size
+    sta VERA::DISP::VSCALE
 
     ldy #8                                      ; UI palette is 8 bytes long
     lda #UI_PALETTE
@@ -1031,10 +1037,10 @@ getkey:
     jsr inputCheckForInput                      ; wait for the user to acknowledge
     beq getkey
 
-    jsr drawClearScreen                         ;
+    jsr drawClearScreen
 
-    ldx scale
-    vpokex VERA_regs_hi, DC_VSCALE              ; restore the screen v scale
+    lda scale                                   ; restore the screen v scale
+    sta VERA::DISP::VSCALE
 
     rts 
 
@@ -1112,18 +1118,20 @@ enter:
     ROW_LEN = 120
 
     lda #0                                      ; Set channel and address lo
-    sta VERA_CTRL                               ; all functions leave with low active (convention)
+    sta VERA::CTRL                              ; all functions leave with low active (convention)
 
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_GFX
+    lda #VSCALE_GFX
+    sta VERA::DISP::VSCALE
 
-; layer1 mem at gfx_layer1
-    vpoke VERA_regs_hi, VERA_regs_layer1 + Ln_TILE_BASE_H, (gfx_layer1 >> 10) 
-; 4bpp but hidden
-    vpoke VERA_regs_hi, VERA_regs_layer0 + Ln_CTRL0, $c0
+    lda #(gfx_layer1 >> 9)                      ; layer1 mem at gfx_layer1
+    sta VERA::L0::TILE_BASE
 
-; 4bpp but hidden
-    vpoke VERA_regs_hi, VERA_regs_layer1 + Ln_CTRL0, $c0
+    lda VERA::DISP::VIDEO
+    and #%11001111                              ; both latyers off
+    sta VERA::DISP::VIDEO
 
+    lda #%00000110                              ; set bitmap mode and 4bpp
+    sta VERA::L0::CONFIG
 
     lda #<((logoEnd-logoStart)/3)               ; length of all encoded bytes / 3
     sta zTemp1                                  ; is the length to process
@@ -1140,13 +1148,13 @@ enter:
     jsr drawSetPalette
 
     lda #$10                                    ; stride 1 starting at 0,0
-    sta VERA_ADDR_HI
+    sta VERA::ADDR + 2                          ; HI
     lda #>gfx_layer1
     sta hi + 1                                  ; not needed but allows code
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
     lda #<gfx_layer1
     sta lo + 1                                  ; to run a 2nd time (after CTRL-R in emulator, for example)
-    sta VERA_ADDR_LO
+    sta VERA::ADDR                              ; LO
 
     lda #ROW_LEN                                ; the encoded data needs to be
     sta zTemp5                                  ; broken to a NL every 120 bytes
@@ -1178,11 +1186,13 @@ loop:                                           ; the decode loop
     lda zTemp2                                  ; get the hi
     bpl loop                                    ; if not underflow more to decompress
 
-; show the 4bpp layer
-    vpoke VERA_regs_hi, VERA_regs_layer1 + Ln_CTRL0, $c1
+    lda VERA::DISP::VIDEO
+    and #%11001111                              ; both latyers off
+    ora #%00010000                              ; turn layer 0 on (show the 4bpp image)
+    sta VERA::DISP::VIDEO
 
     lda #$00                                    ; restore the HI addr to 0 (is assumed elsewhere)
-    sta VERA_ADDR_HI
+    sta VERA::ADDR+2                            ; HI
 
     rts                                         ; all done
 
@@ -1191,7 +1201,7 @@ store:
     iny                                         ; get the byte to write
     lda (zaLogoDataL), y 
 :
-    sta VERA_DATA0                              ; store to vera
+    sta VERA::DATA0                             ; store to vera
     dec zTemp5                                  ; end of a row?
     beq nextRow
 cont:
@@ -1210,11 +1220,11 @@ nextRow:                                        ; reached row end, move vera to 
 
 hi:
     lda #>gfx_layer1                            ; update vera
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
 
 lo:
     lda #<gfx_layer1
-    sta VERA_ADDR_LO
+    sta VERA::ADDR                              ; LO
 
     lda #ROW_LEN                                ; reset the row counter
     sta zTemp5
@@ -1258,8 +1268,8 @@ loop:
     lda color                                   ; flip the color
     eor #1
     sta color
-    tax                                         ; set the border color
-    vpokex 15, DC_BORDER_COLOR
+; tax
+    sta VERA::DISP::FRAME                       ; set the border color
     ldx #$00                                    ; set up for a delay
     ldy delay
 :

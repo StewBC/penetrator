@@ -13,7 +13,8 @@
 
     jsr drawClearScreen                         ; make sure the screen is clear before adjusting the
 
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_GAME  ; make the screen shorter to be more spectrum-like for gameplay
+    lda #VSCALE_GAME                            ; make the screen shorter to be more spectrum-like for gameplay
+    sta VERA::DISP::VSCALE
 
     jsr editInit
     jsr editLoadStage
@@ -288,7 +289,7 @@ missile:
     print textEditDnArrow, playerShipX, 0, #$ff ; redraw arrow to fix out of top cursor overwrite
 
     lda #$10                                    ; stride of 1
-    sta VERA_ADDR_HI
+    sta VERA::ADDR + 2                          ; HI
 
     lda #$87                                    ; cursor symbol
     ldy #0
@@ -305,17 +306,17 @@ plotLoop:
     lda rowL, y                                 ; get the memory address
     clc 
     adc playerShipX                             ; add in column
-    sta VERA_ADDR_LO                            ; point vera at memory
+    sta VERA::ADDR                              ; point vera at memory
     lda rowH, y
     adc layersH, x
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
 
     ldy zaFontOffset                            ; get the offset into the character
     lda (zaFontL), y                            ; get the actual left character byte
-    sta VERA_DATA0                              ; plot the left hand side
+    sta VERA::DATA0                             ; plot the left hand side
     iny                                         ; go to next byte (right hand side of character)
     lda (zaFontL), y 
-    sta VERA_DATA0
+    sta VERA::DATA0
     cpy #$0A                                    ; cursor character is 5 rows high, * 2 is 10 bytes long
     bcs done                                    ; if 10 then done with the cursor
     inc zaFontOffset                            ; move 2 bytes for last row plotted

@@ -21,7 +21,7 @@
     jsr drawClearRows                           ; clean the part where the world must draw
 
     lda #$00                                    ; 0 byte step size and 0 for top address
-    sta VERA_ADDR_HI
+    sta VERA::ADDR + 2                          ; HI
 
     ldy terrainOrigin                           ; set up the column to start drawing
     sty zScreenCol
@@ -81,24 +81,24 @@ done:
 up:                                             ; new < old so go up
     lda rowL, y
     adc zScreenCol
-    sta VERA_ADDR_LO
+    sta VERA::ADDR
     lda rowH, y
     adc zVramH
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
     lda #%01010000                              ; start with a 2 pixel flat area
-    sta VERA_DATA0
+    sta VERA::DATA0
     dey                                         ; go 1 row up
     inx 
     beq skup                                    ; if at new height now, skip the "up line" portion
 :
     lda rowL, y                                 ; draw the "up line" portion now
     adc zScreenCol
-    sta VERA_ADDR_LO
+    sta VERA::ADDR
     lda rowH, y
     adc zVramH
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
     lda #%00000100                              ; write a single pixel up the rows
-    sta VERA_DATA0
+    sta VERA::DATA0
     dey                                         ; row up
     inx 
     bne :-                                      ; keep going till old = new
@@ -106,12 +106,12 @@ up:                                             ; new < old so go up
 skup:
     lda rowL, y                                 ; finish off the transition
     adc zScreenCol
-    sta VERA_ADDR_LO
+    sta VERA::ADDR
     lda rowH, y
     adc zVramH
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
     lda #%00000001                              ; by writing a pixel to connect to new
-    sta VERA_DATA0                              ; (which will become old, in next column, to draw from)
+    sta VERA::DATA0                             ; (which will become old, in next column, to draw from)
     rts
 
 eqdown:
@@ -121,12 +121,12 @@ eqdown:
 down:                                           ; new > old so go down - see up, same but inc|dec is reversed
     lda rowL, y
     adc zScreenCol
-    sta VERA_ADDR_LO
+    sta VERA::ADDR
     lda rowH, y
     adc zVramH
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
     lda #%01010000
-    sta VERA_DATA0
+    sta VERA::DATA0
     iny 
     dex 
     beq skdn
@@ -134,12 +134,12 @@ down:                                           ; new > old so go down - see up,
 :
     lda rowL, y
     adc zScreenCol
-    sta VERA_ADDR_LO
+    sta VERA::ADDR
     lda rowH, y
     adc zVramH
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
     lda #%00000100
-    sta VERA_DATA0
+    sta VERA::DATA0
     iny 
     dex 
     bne :-
@@ -147,25 +147,24 @@ down:                                           ; new > old so go down - see up,
 skdn:
     lda rowL, y
     adc zScreenCol
-    sta VERA_ADDR_LO
+    sta VERA::ADDR
     lda rowH, y
     adc zVramH
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
     lda #%00000001
-    sta VERA_DATA0
+    sta VERA::DATA0
     rts
 
 eq:                                             ; flat line from old to new when equal
     lda rowL, y
     adc zScreenCol
-    sta VERA_ADDR_LO
+    sta VERA::ADDR
     lda rowH, y
     adc zVramH
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
     lda #%01010101                              ; 4 pixels in a line
-    sta VERA_DATA0
+    sta VERA::DATA0
 
     rts
 
 .endproc
-

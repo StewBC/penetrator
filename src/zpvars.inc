@@ -10,6 +10,7 @@
 
 ;-----------------------------------------------------------------------------
 ; zero page variables
+zRegs:                  .res 2 * 16             ; Leave space for R0-R15
 zWorldPtr:              .res 2                  ; where data is next read from the world stream
 zVramH:                 .res 1                  ; for VERA writes, points at the Hi of the back bank RAM
 zScreenCol:             .res 1                  ; used for drawing - the column to draw

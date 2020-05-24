@@ -6,45 +6,18 @@
 ; This is free and unencumbered software released into the public domain.
 
 ;-----------------------------------------------------------------------------
-; VERA
-VERA_ADDR_LO     = $9F20
-VERA_ADDR_MID    = $9F21
-VERA_ADDR_HI     = $9F22
-VERA_DATA0       = $9F23
-VERA_DATA1       = $9F24
-VERA_CTRL        = $9F25
-VERA_IEN         = $9F26
-VERA_ISR         = $9F27
-
-DC_VIDEO         = $00
-DC_HSCALE        = $01
-DC_VSCALE        = $02
-DC_BORDER_COLOR  = $03
-DC_HSTART_L      = $04
-DC_HSTOP_L       = $05
-DC_VSTART_L      = $06
-DC_VSTOP_L       = $07
-DC_STARTSTOP_H   = $08
-
-VERA_regs_hi     = $0F
-VERA_regs_layer0 = $2000
-VERA_regs_layer1 = $3000
+; VRAM locations
 ram_layer0       = $0000                        ; after title, layer 0 memory here
 ram_layer1       = $5000                        ; after title, layer 1 memory here
 gfx_layer1       = $0000                        ; the 4bpp title screen memory start
 
-Ln_CTRL0         = $00
-Ln_CTRL1         = $01
-Ln_TILE_BASE_H   = $05
-Ln_BM_PAL_OFFS   = $07
 ;-----------------------------------------------------------------------------
 ; System locations
-; These are for r34 - find them in rom.sym in the emulator folder
-TIME_1           = $0293                        ; TIME is at $0292 - +1 is APPROX 3.75 sec/tick
-TIME_2           = $0294                        ; TIME is at $0292 - +2 is the 16 ms counter
-NDX              = $029E
-JOY1             = $02BC
-GETJOY           = $FF06
+; These are for r37 - find them in kernal.sym in the emulator folder
+NDX              = $A00A
+TIME_1           = $A038                        ; TIMER is at $A037 (bank 0) - +1 is APPROX 3.75 sec/tick
+TIME_2           = $A039                        ; +2 is the jiffy counter (also at $A03D?)
+JOYGET           = $FF56
 SETLFS           = $FFBA
 SETNAM           = $FFBD
 LOAD             = $FFD5

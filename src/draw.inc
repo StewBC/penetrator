@@ -18,15 +18,21 @@
     sta backLayer
     beq :+
 
-    vpoke VERA_regs_hi, VERA_regs_layer0 + Ln_CTRL0, $a1
-    vpoke VERA_regs_hi, VERA_regs_layer1 + Ln_CTRL0, $a0
+    lda VERA::DISP::VIDEO
+    and #%11001111                              ; both latyers off
+    ora #%00010000                              ; turn layer 0 on
+    sta VERA::DISP::VIDEO
+
     lda #>ram_layer1
     sta zVramH
     rts 
 
 :
-    vpoke VERA_regs_hi, VERA_regs_layer0 + Ln_CTRL0, $a0
-    vpoke VERA_regs_hi, VERA_regs_layer1 + Ln_CTRL0, $a1
+    lda VERA::DISP::VIDEO
+    and #%11001111                              ; both latyers off
+    ora #%00100000                              ; turn layer 1 on
+    sta VERA::DISP::VIDEO
+
     lda #>ram_layer0
     sta zVramH
     rts 
@@ -41,19 +47,19 @@
     pha 
     clc 
     lda rowL, y                                 ; strictly also adc layersL, x but always 256-byte aligned
-    sta VERA_ADDR_LO
+    sta VERA::ADDR                              ;LO
     lda rowH, y
     adc layersH, x
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ;MID
     lda #$10                                    ; 1 byte step size and 0 for top address
-    sta VERA_ADDR_HI
+    sta VERA::ADDR + 2                          ;HI
     pla                                         ; put the # of rows in Y
     tay 
     lda #$00
 row:
     ldx #XSIZE                                  ; and all columns
 :
-    sta VERA_DATA0                              ; set to 0
+    sta VERA::DATA0                             ; set to 0
     dex 
     bne :-
     dey 
@@ -90,22 +96,22 @@ row:
     asl 
     tax                                         ; use as offset into palette table
     
-    lda #$1F                                    ; set vera for palette entry
-    sta VERA_ADDR_HI
-    lda #>$1000
-    sta VERA_ADDR_MID
-    lda #<$1000
-    sta VERA_ADDR_LO
+    lda #$11                                    ; set vera for palette entry
+    sta VERA::ADDR + 2                          ; HI
+    lda #>$FA00
+    sta VERA::ADDR + 1                          ; MID
+    lda #<$FA00
+    sta VERA::ADDR                              ; LO
 
 :
     lda gamePalette, x                          ; store the palette into vera
-    sta VERA_DATA0
+    sta VERA::DATA0
     inx 
     dey 
     bne :-
 
     lda #$00                                    ; restore the HI addr to 0 (is assumed elsewhere)
-    sta VERA_ADDR_HI
+    sta VERA::ADDR + 2                          ; HI
 
     rts 
 
@@ -137,19 +143,19 @@ row:
     sta rows                                    ; save as count for how many rows
 
     lda #$10                                    ; to be sure, set the stride to 1
-    sta VERA_ADDR_HI
+    sta VERA::ADDR + 2                          ; HI
 
 loop:
     lda rowL, y 
     adc x0                                      ; get the x y address
-    sta VERA_ADDR_LO
+    sta VERA::ADDR                              ; LO
     lda rowH, y 
     adc zVramH 
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
     lda plotCol                                 ; get the plot color
     ldx width                                   ; get how wide to go
 :
-    sta VERA_DATA0                              ; write one row of pixels
+    sta VERA::DATA0                             ; write one row of pixels
     dex 
     bne :-
     iny                                         ; keep doing till
@@ -186,15 +192,15 @@ column:
 rows:
     lda rowL, y                                 ; get the screen row start address, low byte
     adc zaScreenColLocal                        ; add the column to the address
-    sta VERA_ADDR_LO                            ; set vera low address
+    sta VERA::ADDR                              ; set vera low address
     lda rowH, y                                 ; get the high byte of the screen row start
     adc zVramH                                  ; add the VRAM high byte (for which layer)
-    sta VERA_ADDR_MID                           ; set the Vera MID (high is already = 0)
+    sta VERA::ADDR + 1                          ; set the Vera MID (high is already = 0)
 offset:
     lda spriteData, x                           ; this address is modified by the caller
     sta zaDrawByte                              ; save the byte
-    eor VERA_DATA0                              ; get what's on screen xor'd with what's being added
-    sta VERA_DATA0                              ; save that to the screen
+    eor VERA::DATA0                             ; get what's on screen xor'd with what's being added
+    sta VERA::DATA0                             ; save that to the screen
     and zaDrawByte                              ; mask off any bits that the sprite isn't setting
     cmp zaDrawByte                              ; see if the sprite overlapped something there already
     clc                                         ; cmp can set carry.  keep it clear
@@ -589,13 +595,13 @@ bullet:
 
     clc                                         ; put the bullet at height y col x on screen
     adc rowL, y
-    sta VERA_ADDR_LO
+    sta VERA::ADDR
     lda rowH, y
     adc zVramH
-    sta VERA_ADDR_MID
+    sta VERA::ADDR + 1                          ; MID
     lda #$ff                                    ; bullet is a solid line
-    eor VERA_DATA0
-    sta VERA_DATA0
+    eor VERA::DATA0
+    sta VERA::DATA0
     cmp #$ff                                    ; see if it hit something
     beq next                                    ; no collision, next (prev) column/bullet
 

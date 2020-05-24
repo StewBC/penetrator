@@ -18,6 +18,7 @@
 jmp main                                        ; This ends up at $080d (sys 2061's target)
 
 ;-----------------------------------------------------------------------------
+.include "cx16.inc"                             ; cc65 VERA etc defenitions
 .include "defs.inc"                             ; constants
 .include "macros.inc"                           ; vpoke, vpeek, print* & wait.
 .include "zpvars.inc"                           ; Zero Page usage (variables)
@@ -53,14 +54,10 @@ jmp main                                        ; This ends up at $080d (sys 206
 .proc mainVeraSetup
 
     lda #%10000000                              ; Reset Vera just to be sure the game starts in a known state
-    sta VERA_CTRL
+    ora VERA::CTRL
 
-    vpoke VERA_regs_hi, DC_VIDEO      , $01     ; this shouldn't be necessary surely?  VGA
-    vpoke VERA_regs_hi, DC_HSTART_L   , $00     ; turn the border off - left
-    vpoke VERA_regs_hi, DC_HSTOP_L    , $80     ; right
-    vpoke VERA_regs_hi, DC_VSTART_L   , $00     ; top
-    vpoke VERA_regs_hi, DC_VSTOP_L    , $E0     ; bottom
-    vpoke VERA_regs_hi, DC_STARTSTOP_H, $28
+    lda #0                                      ; put ram bank 0 in memory
+    sta VIA1::PRA
 
     rts 
 
@@ -71,14 +68,23 @@ jmp main                                        ; This ends up at $080d (sys 206
 
     jsr drawClearScreen
 
-    vpoke VERA_regs_hi, DC_HSCALE, HSCALE
+    lda #HSCALE + 1                             ; Adjusted this and HSTOP so I don't have to re-encode the
+    sta VERA::DISP::HSCALE                      ; logo for the changes from R34 to R37
 
     jsr uiShowLogoGraphic
 
-    vpoke VERA_regs_hi, DC_HSTART_L, $51        ; turn the border on - left
-    vpoke VERA_regs_hi, DC_HSTOP_L , $30        ; right
-    vpoke VERA_regs_hi, DC_VSTART_L, $12        ; top
-    vpoke VERA_regs_hi, DC_VSTOP_L , $CC        ; bottom
+    lda #%00000010
+    sta VERA::CTRL                              ; Map border controls in
+    lda #20                                     ; now set the borders (h/4 and v/2)
+    sta VERA::DISP::HSTART
+    lda #138
+    sta VERA::DISP::HSTOP
+    lda #(20/2)
+    sta VERA::DISP::VSTART
+    lda #((480-15)/2)
+    sta VERA::DISP::VSTOP
+    lda #%00000000
+    sta VERA::CTRL
 
     lda #0
     sta NDX                                     ; flush the keyboard buffer (before the load display)
@@ -89,10 +95,20 @@ jmp main                                        ; This ends up at $080d (sys 206
     jsr inputCheckForInput                      ; wait for user interaction
     beq :-
 
-    vpoke VERA_regs_hi, DC_HSTART_L, $00        ; turn the border off - left
-    vpoke VERA_regs_hi, DC_HSTOP_L , $80        ; right
-    vpoke VERA_regs_hi, DC_VSTART_L, $00        ; top
-    vpoke VERA_regs_hi, DC_VSTOP_L , $E0        ; bottom
+    lda #%00000010
+    sta VERA::CTRL
+
+    lda #0
+    sta VERA::DISP::HSTART
+    lda #640/4
+    sta VERA::DISP::HSTOP
+    lda #0
+    sta VERA::DISP::VSTART
+    lda #480/2
+    sta VERA::DISP::VSTOP
+
+    lda #%00000000
+    sta VERA::CTRL
 
     rts 
 
@@ -102,22 +118,30 @@ jmp main                                        ; This ends up at $080d (sys 206
 .proc mainGameSetup
 
     lda #0                                      ; Set channel and address lo
-    sta VERA_CTRL                               ; all functions leave with low active (convention)
+    sta VERA::CTRL                              ; all functions leave with low active (convention)
 
-    vpoke VERA_regs_hi, DC_VSCALE, VSCALE_UI    ; this is adjusted in the flow
-    vpoke VERA_regs_hi, DC_HSCALE, HSCALE       ; reset because in dev I skip mainIntro
+    lda #VSCALE_UI                              ; this is adjusted in the flow
+    sta VERA::DISP::VSCALE                      ; reset because in dev I skip mainIntro
+    lda #HSCALE
+    sta VERA::DISP::HSCALE
 
-; layer0 mem at ram_layer0
-    vpoke VERA_regs_hi, VERA_regs_layer0 + Ln_TILE_BASE_H, (ram_layer0 >> 10)
-; layer1 mem at ram_layer1
-    vpoke VERA_regs_hi, VERA_regs_layer1 + Ln_TILE_BASE_H, (ram_layer1 >> 10) 
+
+    lda #(ram_layer0 >> 9)                      ; layer0 mem at ram_layer0
+    sta VERA::L0::TILE_BASE
+
+    lda #(ram_layer1 >> 9)                      ; layer1 mem at ram_layer1
+    sta VERA::L1::TILE_BASE
 
     lda #0                                      ; mark a layer as inactive
     sta backLayer
 
-; hide both layers
-    vpoke VERA_regs_hi, VERA_regs_layer0 + Ln_CTRL0, $a0 
-    vpoke VERA_regs_hi, VERA_regs_layer1 + Ln_CTRL0, $a0
+    lda VERA::DISP::VIDEO
+    and #%11001111                              ; both latyers off
+    sta VERA::DISP::VIDEO
+
+    lda #%00000101                              ; set bitmap mode and 2bpp
+    sta VERA::L0::CONFIG
+    sta VERA::L1::CONFIG
 
     ldx #((textHSEnd-textHS) - 1)               ; empty the high score names to spaces
 store:
