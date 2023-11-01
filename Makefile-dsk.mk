@@ -1,4 +1,4 @@
-DSK = Penetrator.dsk
+DSK = $(NAME).dsk
 
 # For this one, see https://applecommander.github.io/
 AC ?= ac.jar
@@ -15,7 +15,7 @@ REMOVES += $(DSK)
 .PHONY: dsk
 dsk: $(DSK)
 
-$(DSK): penetrator.apple2.loader penetrator.apple2
+$(DSK): $(NAME).apple2.loader $(NAME).apple2
 	$(call CP, apple2/template.dsk $@)
-	java -jar $(AC) -p  $@ penetrat.system sys < penetrator.apple2.loader
-	java -jar $(AC) -as $@ penetrat        bin < penetrator.apple2
+	java -jar $(AC) -p  $@ penetrat.system sys < $(NAME).apple2.loader
+	java -jar $(AC) -as $@ penetrat        bin < $(NAME).apple2

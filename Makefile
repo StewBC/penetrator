@@ -43,6 +43,8 @@ else
   NAME := $(PROGRAM)
 endif
 $(NAME).apple2: LDFLAGS += 
+$(NAME).cx16: LDFLAGS += 
+$(NAME).plus4: LDFLAGS += 
 
 # Path to the directory containing C and ASM sources.
 # Default: src
@@ -73,7 +75,7 @@ ifeq ($(OS),Windows_NT)
 else 
   UNAME_S := $(shell uname -s)
   ifeq ($(UNAME_S),Darwin)
-    VICE_HOME := /Applications/Vice/x64.app/Contents/MacOS/
+    VICE_HOME ?= /Applications/Vice/x64.app/Contents/MacOS/
   endif
 endif
 
@@ -176,8 +178,8 @@ c16_EMUCMD := $(VICE_HOME)xplus4 -ramsize 16 -TEDdsize -autoload
 cbm510_EMUCMD := $(VICE_HOME)xcbm2 -model 510 -VICIIdsize -autoload
 cbm610_EMUCMD := $(VICE_HOME)xcbm2 -model 610 -Crtcdsize -autoload
 atari_EMUCMD := $(ATARI_HOME)Altirra64 /defprofile:800 /disk 
-cx16_EMUCMD := $(CX16_HOME)x16emu -run -prg
-apple2_EMUCMD := $(AWIN_HOME)AppleWin.exe -d1 $(PROGRAM).po
+cx16_EMUCMD := $(CX16_HOME)x16emu -run -prg $(PROGRAM).cx16
+apple2_EMUCMD := $(APPLEWIN_HOME)AppleWin.exe -d1 $(PROGRAM).dsk
 atmos_EMUCMD := $(ORIC_HOME)Oricutron.exe -t 
 
 ifeq ($(EMUCMD),)
@@ -328,7 +330,7 @@ $(PROGRAM): $(CONFIG) $(OBJECTS) $(LIBS)
 
 test: $(PROGRAM)
 	$(PREEMUCMD)
-	$(EMUCMD) $(notdir $(<))
+	$(EMUCMD)
  	$(POSTEMUCMD)
 
 clean:

@@ -16,4 +16,4 @@ d64: $(D64)
 
 $(D64): $(NAME).plus4
 	$(C1541) -format "$(NAME)","01" d64 $(NAME).d64
-	$(foreach t,$^,$(C1541) -attach $(NAME).d64 -write $t $t$(NEWLINE))
+	$(foreach t,$^,-$(C1541) -attach $(NAME).d64 -write $t $t$(NEWLINE))
