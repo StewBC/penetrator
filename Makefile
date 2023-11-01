@@ -10,11 +10,11 @@
 
 # Space or comma separated list of cc65 supported target platforms to build for.
 # Default: c64 (lowercase!)
-TARGETS := cx16
+TARGETS := cx16 apple2 plus4
 
 # Name of the final, single-file executable.
 # Default: name of the current dir with target name appended
-PROGRAM :=
+PROGRAM := 
 
 # Path(s) to additional libraries required for linking the program
 # Use only if you don't want to place copies of the libraries in SRCDIR
@@ -26,17 +26,23 @@ LIBS    :=
 # Default: none
 CONFIG  :=
 
-# Additional C compiler flags and options.
+# Additional C assembler flags and options.
 # Default: none
 CFLAGS  =
 
 # Additional assembler flags and options.
 # Default: none
-ASFLAGS = --debug-info --listing $@.lst
+ASFLAGS = 
 
 # Additional linker flags and options.
 # Default: none
-LDFLAGS = -u __EXEHDR__ -vm -m $@.map -Ln $@.vice
+LDFLAGS =
+ifeq ($(PROGRAM),)
+  NAME := $(notdir $(CURDIR))
+else 
+  NAME := $(PROGRAM)
+endif
+$(NAME).apple2: LDFLAGS += 
 
 # Path to the directory containing C and ASM sources.
 # Default: src
@@ -56,15 +62,14 @@ EMUCMD :=
 #PREEMUCMD := osascript -e "tell application \"X11\" to activate"
 #POSTEMUCMD := osascript -e "tell application \"System Events\" to tell process \"X11\" to set visible to false"
 #POSTEMUCMD := osascript -e "tell application \"Terminal\" to activate"
-PREEMUCMD :=
+# PREEMUCMD := $(SED) "s/^al \([[0-9A-F]\+\)\ \./\1 /g" $(NAME).apple2.lbl > $(APPLEWIN_HOME)\A2_USER1.SYM
 POSTEMUCMD :=
 
 # On Windows machines VICE emulators may not be available in the PATH by default.
 # In such case, please set the variable below to point to directory containing
 # VICE emulators.
 ifeq ($(OS),Windows_NT)
-  VICE_HOME :=
-  CX16_HOME := 
+  VICE_HOME ?=
 else 
   UNAME_S := $(shell uname -s)
   ifeq ($(UNAME_S),Darwin)
@@ -81,22 +86,22 @@ STATEFILE := Makefile.options
 ###################################################################################
 
 ###################################################################################
-### Mapping abstract options to the actual compiler, assembler and linker flags ###
-### Predefined compiler, assembler and linker flags, used with abstract options ###
+### Mapping abstract options to the actual assembler, assembler and linker flags ###
+### Predefined assembler, assembler and linker flags, used with abstract options ###
 ### valid for 2.14.x. Consult the documentation of your cc65 version before use ###
 ###################################################################################
 
-# Compiler flags used to tell the compiler to optimise for SPEED
+# assembler flags used to tell the assembler to optimise for SPEED
 define _optspeed_
   CFLAGS += -Oris
 endef
 
-# Compiler flags used to tell the compiler to optimise for SIZE
+# assembler flags used to tell the assembler to optimise for SIZE
 define _optsize_
   CFLAGS += -Or
 endef
 
-# Compiler and assembler flags for generating listings
+# assembler and assembler flags for generating listings
 define _listing_
   CFLAGS += --listing $$(@:.o=.lst)
   ASFLAGS += --listing $$(@:.o=.lst)
@@ -111,6 +116,7 @@ endef
 
 # Linker flags for generating VICE label file
 define _labelfile_
+  ASFLAGS += --debug-info 
   LDFLAGS += -Ln $$@.lbl
   REMOVES += $(PROGRAM).lbl
 endef
@@ -150,21 +156,29 @@ ifeq ($(OBJDIR),)
 endif
 TARGETOBJDIR := $(OBJDIR)/$(TARGETS)
 
+# On Windows it is mandatory to have CC65_HOME set. So do not unnecessarily
+# rely on cl65 being added to the PATH in this scenario.
+ifdef CC65_HOME
+  CC := $(CC65_HOME)/bin/cl65
+else
+  CC := cl65
+endif
+
 # Default emulator commands and options for particular targets.
 # Set EMUCMD to override.
-c64_EMUCMD := $(VICE_HOME)x64 -kernal kernal -VICIIdsize -autostart
+c64_EMUCMD := $(VICE_HOME)x64sc -autostart $(PROGRAM).c64
 c128_EMUCMD := $(VICE_HOME)x128 -kernal kernal -VICIIdsize -autoload
 vic20_EMUCMD := $(VICE_HOME)xvic -kernal kernal -VICdsize -autoload
 pet_EMUCMD := $(VICE_HOME)xpet -Crtcdsize -autoload
-plus4_EMUCMD := $(VICE_HOME)xplus4 -TEDdsize -autoload
+plus4_EMUCMD := $(VICE_HOME)xplus4.exe -TEDdsize -autostart $(PROGRAM).plus4
 # So far there is no x16 emulator in VICE (why??) so we have to use xplus4 with -memsize option
 c16_EMUCMD := $(VICE_HOME)xplus4 -ramsize 16 -TEDdsize -autoload
 cbm510_EMUCMD := $(VICE_HOME)xcbm2 -model 510 -VICIIdsize -autoload
 cbm610_EMUCMD := $(VICE_HOME)xcbm2 -model 610 -Crtcdsize -autoload
-atari_EMUCMD := atari800 -windowed -xl -pal -nopatchall -run
-apple2_EMUCMD := $(AWIN_HOME)AppleWin.exe -d1 
-atmos_EMUCMD := $(ORIC_HOME)Oricutron.exe -t 
+atari_EMUCMD := $(ATARI_HOME)Altirra64 /defprofile:800 /disk 
 cx16_EMUCMD := $(CX16_HOME)x16emu -run -prg
+apple2_EMUCMD := $(AWIN_HOME)AppleWin.exe -d1 $(PROGRAM).po
+atmos_EMUCMD := $(ORIC_HOME)Oricutron.exe -t 
 
 ifeq ($(EMUCMD),)
   EMUCMD = $($(CC65TARGET)_EMUCMD)
@@ -176,10 +190,10 @@ endif
 
 # The "Native Win32" GNU Make contains quite some workarounds to get along with
 # cmd.exe as shell. However it does not provide means to determine that it does
-# actually activate those workarounds. Especially $(SHELL) does NOT contain the
+# actually activate those workarounds. Especially does $(SHELL) NOT contain the
 # value 'cmd.exe'. So the usual way to determine if cmd.exe is being used is to
 # execute the command 'echo' without any parameters. Only cmd.exe will return a
-# non-empty string - saying 'ECHO is on/off'.
+# non-empy string - saying 'ECHO is on/off'.
 #
 # Many "Native Win32" programs accept '/' as directory delimiter just fine. How-
 # ever the internal commands of cmd.exe generally require '\' to be used.
@@ -292,29 +306,29 @@ $(TARGETOBJDIR):
 vpath %.c $(SRCDIR)/$(TARGETLIST) $(SRCDIR)
 
 $(TARGETOBJDIR)/%.o: %.c | $(TARGETOBJDIR)
-	cl65 -t $(CC65TARGET) -c --create-dep $(@:.o=.d) $(CFLAGS) -o $@ $<
+	$(CC) -t $(CC65TARGET) -c --create-dep $(@:.o=.d) $(CFLAGS) -o $@ $<
 
 vpath %.s $(SRCDIR)/$(TARGETLIST) $(SRCDIR)
 
 $(TARGETOBJDIR)/%.o: %.s | $(TARGETOBJDIR)
-	cl65 -t $(CC65TARGET) -c --create-dep $(@:.o=.d) $(ASFLAGS) -o $@ $<
+	$(CC) -t $(CC65TARGET) -c --create-dep $(@:.o=.d) $(ASFLAGS) -o $@ $<
 
 vpath %.asm $(SRCDIR)/$(TARGETLIST) $(SRCDIR)
 
 $(TARGETOBJDIR)/%.o: %.asm | $(TARGETOBJDIR)
-	cl65 -t $(CC65TARGET) -c --create-dep $(@:.o=.d) $(ASFLAGS) -o $@ $<
+	$(CC) -t $(CC65TARGET) -c --create-dep $(@:.o=.d) $(ASFLAGS) -o $@ $<
 
 vpath %.a65 $(SRCDIR)/$(TARGETLIST) $(SRCDIR)
 
 $(TARGETOBJDIR)/%.o: %.a65 | $(TARGETOBJDIR)
-	cl65 -t $(CC65TARGET) -c --create-dep $(@:.o=.d) $(ASFLAGS) -o $@ $<
+	$(CC) -t $(CC65TARGET) -c --create-dep $(@:.o=.d) $(ASFLAGS) -o $@ $<
 
 $(PROGRAM): $(CONFIG) $(OBJECTS) $(LIBS)
-	cl65 -t $(CC65TARGET) $(LDFLAGS) -o $@ $(patsubst %.cfg,-C %.cfg,$^)
+	$(CC) -t $(CC65TARGET) $(LDFLAGS) -o $@ $(patsubst %.cfg,-C %.cfg,$^)
 
 test: $(PROGRAM)
 	$(PREEMUCMD)
-	$(EMUCMD) $<
+	$(EMUCMD) $(notdir $(<))
  	$(POSTEMUCMD)
 
 clean:
