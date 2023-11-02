@@ -12,9 +12,10 @@
 .segment "CODE"
 
 ;-----------------------------------------------------------------------------
+; Adress of where to start save in AX
 .proc saveFile
 
-    pha
+    pha                                         ; Push AX (address of where to save ends)
     txa
     pha
 
@@ -28,21 +29,22 @@
     ldy #$FF                                    ; secondary address
     jsr SETLFS
 
-    pla
+    pla                                         ; Put save end address in XY
     tay
     pla
     tax
 
-    lda #<fileStartL                           ; start address storage location
-    jmp SAVESP                                    ; call save to save the world
+    lda #<fileStartL                            ; start address storage location
+    jmp SAVESP                                  ; call save to save the world
 
 .endproc
 
 ;-----------------------------------------------------------------------------
+; Adress of where to load file in AX
 .proc loadFile
 
-    pha
-    tax
+    pha                                         ; Push the address of where to load (AX)
+    txa
     pha
 
     lda DOSF1L
@@ -52,29 +54,28 @@
 
     lda #$00                                    ; logical number
     ldx #$08                                    ; device 8
-    ldy #$01                                    ; secondary address
+    ldy #$00                                    ; secondary address (relocate)
     jsr SETLFS 
 
-    pla
+    pla                                         ; put load to address in XY
     tay
     pla
     tax
 
-    lda #$00                                    ; $00 is load ($01 is verify I think)
-    jsr LOADSP                                  ; call load to load the world
-    rts
+    lda #$00                                    ; $00 is load ($01 is verify)
+    jmp LOADSP                                  ; call load to load the world
 
 .endproc
 
 ;-----------------------------------------------------------------------------
 .proc saveWorld
 
-    lda #<worldDataStart                                         ; set the size
+    lda #<worldDataStart                        ; set the size
     sta fileStartL
     lda #>worldDataStart
     sta fileStartH
 
-    lda #<worldDataEnd                                                        ; set the location
+    lda #<worldDataEnd                          ; set the location
     ldx #>worldDataEnd
 
     jmp saveFile                                ; save
@@ -84,7 +85,7 @@
 ;-----------------------------------------------------------------------------
 .proc loadWorld
 
-    lda #<worldDataStart
+    lda #<worldDataStart                        ; Where to load in AX
     ldx #>worldDataStart
     jmp loadFile                                ; load
 
@@ -95,7 +96,7 @@
 
     jsr setHighScoreFileNames                   ; set the name
 
-    lda #<scoresTable                                                           ; set the location
+    lda #<scoresTable                           ; set the location
     sta fileStartL
     lda #>scoresTable
     sta fileStartH
