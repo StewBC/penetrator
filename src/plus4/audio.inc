@@ -11,7 +11,7 @@
 ; Runs in the IRQ
 ; As long as audioChannel? is <> 0, keep the sound going.  When it is 0, see
 ; if audioChan?Lo points at 0.  If yes, turn off sound.  If no, put the
-; freq and delay in placr - delay in audioChannel?
+; freq and delay in place - delay in audioChannel?
 .proc audioService
     lda audioChannel1
     beq c2
@@ -87,7 +87,7 @@ makeSounds:
     bit Bit5Mask                                ; AUDIO_EXPLOSION
     bne explosion
 
-    bit Bit8432Mask                             ; AUDIO_ENGINE - Not that bit 8 is erroneusly checked
+    bit Bit8432Mask                             ; AUDIO_ENGINE - Not that bit 8 is erroneously checked
     bne engine                                  ; only because I didn't want to make a new constant
 
     bit Bit1Mask                                ; AUDIO_UI_TICK
@@ -121,7 +121,7 @@ bombDrop:
 ui:
     lda #<uiSound
     ldx #>uiSound
-    ldy #1
+    ldy #0
     jmp audioPlayNote
 
 engine:
@@ -154,8 +154,9 @@ fire:
 
 ;-----------------------------------------------------------------------------
 ; Load Y just before calling with the channel
-; 1 - Shoot, UI, Bomb
-; 2 - Engine, Explosion
+; (Y=0) C 1 - Shoot, UI
+; (Y=1) C 2 - Engine, Bomb
+;       C Noise - Explosion - does not come here
 .proc audioPlayNote
 
     sei
