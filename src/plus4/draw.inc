@@ -603,7 +603,7 @@ explode:
     lda radarColor,y
     sta zSpriteColor
 
-    lda zScreenCol                              ; see if it's an even or odd sceeen sub-column
+    lda zScreenCol                              ; see if it's an even or odd screen sub-column
     and #$01
     beq evenScreen
 
@@ -627,7 +627,7 @@ oddScreen:
     sta drawSprite::offset + 1
     lda radarUH, x
     sta drawSprite::offset + 2
-    lda #4                                      ; snd set the step size
+    lda #4                                      ; and set the step size
     sta zaSkipLength
     bne draw
 
@@ -690,7 +690,7 @@ draw:
     lda missileColor,y
     sta zSpriteColor
 
-    lda zScreenCol                              ; see if it's an even or odd sceeen sub-column
+    lda zScreenCol                              ; see if it's an even or odd screen sub-column
     and #$01
     beq evenScreen
 
@@ -759,7 +759,7 @@ draw:
     lda #NUKE_HEIGHT
     sta zaDrawSprHeight
 
-    lda zScreenCol                              ; see if it's an even or odd sceeen sub-column
+    lda zScreenCol                              ; see if it's an even or odd screen sub-column
     and #$01
     beq evenScreen
 
@@ -832,7 +832,7 @@ draw:
     and #%00000011
     tax
 
-    lda zScreenCol                              ; see if it's an even or odd sceeen sub-column
+    lda zScreenCol                              ; see if it's an even or odd screen sub-column
     lsr
     bcc evenScreen
 
@@ -1087,7 +1087,7 @@ loc:
     cmp zaMask
     bne collision
     ldx zaBulletCol                             ; go back to the loop using the next
-    inx                                         ; buffer and sceeen column
+    inx                                         ; buffer and screen column
     inc zScreenCol
     jmp next
 
@@ -1173,7 +1173,7 @@ explode:
     lda #EXPLOSION_HEIGHT
     sta zaDrawSprHeight
 
-    lda zScreenCol                              ; see if it's an even or odd sceeen sub-column
+    lda zScreenCol                              ; see if it's an even or odd screen sub-column
     and #$01
     beq evenScreen
 

@@ -46,7 +46,7 @@
 ;  3. This notice may not be removed or altered from any source distribution.
 ; -----------------------------------------------------------------------------
 
-NIBCOUNT = tmp1                          ; zero-page location for temp offset
+NIBCOUNT = tmp1                         ; zero-page location for temp offset
 
 DECOMPRESS_LZSA2:
    LDY #$00

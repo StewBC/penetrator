@@ -83,7 +83,7 @@ audioFrame:      .res 1                         ; prioritized mask for sounds to
 audioExplFrame:  .res 1                         ; explosion frame index, for sound
 audioChannel1:   .res 1                         ; Counter for how long to play this freq, this channel
 audioChannel2:   .res 1
-audioChan1Lo:    .res 1                         ; Pointer to this chanell's sound stran
+audioChan1Lo:    .res 1                         ; Pointer to the channel sound stream
 audioChan1Hi:    .res 1
 audioChan2Lo:    .res 1
 audioChan2Hi:    .res 1

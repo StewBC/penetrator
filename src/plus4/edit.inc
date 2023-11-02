@@ -22,7 +22,7 @@ loop:
     jsr inputEdit
     beq :+
     jsr editHandleKeys
-    lda pause                                   ; pause is quit flag in endit
+    lda pause                                   ; pause is quit flag in edit
     beq :+
     rts
 :

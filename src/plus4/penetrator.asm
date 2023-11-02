@@ -93,35 +93,35 @@ next:
     sei                                         ; decompress title screen to display
     sta TED_enable_ram
 
-    lda	#<__TITLECOL_LOAD__
-    sta	LZSA_SRC+1
-    lda	#>__TITLECOL_LOAD__
-    sta	LZSA_SRC+2
-    lda	#<color_layer0
-    sta	LZSA_DST+1
-    lda	#>color_layer0
-    sta	LZSA_DST+2
-    jsr	DECOMPRESS_LZSA2
+    lda #<__TITLECOL_LOAD__
+    sta LZSA_SRC+1
+    lda #>__TITLECOL_LOAD__
+    sta LZSA_SRC+2
+    lda #<color_layer0
+    sta LZSA_DST+1
+    lda #>color_layer0
+    sta LZSA_DST+2
+    jsr DECOMPRESS_LZSA2
 
-    lda	#<__TITLELUM_LOAD__
-    sta	LZSA_SRC+1
-    lda	#>__TITLELUM_LOAD__
-    sta	LZSA_SRC+2
-    lda	#<luma_layer0
-    sta	LZSA_DST+1
-    lda	#>luma_layer0
-    sta	LZSA_DST+2
-    jsr	DECOMPRESS_LZSA2
+    lda #<__TITLELUM_LOAD__
+    sta LZSA_SRC+1
+    lda #>__TITLELUM_LOAD__
+    sta LZSA_SRC+2
+    lda #<luma_layer0
+    sta LZSA_DST+1
+    lda #>luma_layer0
+    sta LZSA_DST+2
+    jsr DECOMPRESS_LZSA2
 
-    lda	#<__TITLEGFX_LOAD__
-    sta	LZSA_SRC+1
-    lda	#>__TITLEGFX_LOAD__
-    sta	LZSA_SRC+2
-    lda	#<ram_layer0
-    sta	LZSA_DST+1
-    lda	#>ram_layer0
-    sta	LZSA_DST+2
-    jsr	DECOMPRESS_LZSA2
+    lda #<__TITLEGFX_LOAD__
+    sta LZSA_SRC+1
+    lda #>__TITLEGFX_LOAD__
+    sta LZSA_SRC+2
+    lda #<ram_layer0
+    sta LZSA_DST+1
+    lda #>ram_layer0
+    sta LZSA_DST+2
+    jsr DECOMPRESS_LZSA2
 
     sta TED_enable_rom
     cli

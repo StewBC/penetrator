@@ -400,7 +400,7 @@ explode:
     lda #RADAR_HEIGHT
     sta zaDrawSprHeight
 
-    lda zScreenCol                              ; see if it's an even or odd sceeen sub-column
+    lda zScreenCol                              ; see if it's an even or odd screen sub-column
     and #$01
     beq evenScreen
 
@@ -426,7 +426,7 @@ oddScreen:
     sta drawSprite::offset + 1
     lda radarUH, x
     sta drawSprite::offset + 2
-    lda #4                                      ; snd set the step size
+    lda #4                                      ; and set the step size
     sta zaSkipLength
     bne draw
 
@@ -487,7 +487,7 @@ draw:
     lda #MISSILE_HEIGHT
     sta zaDrawSprHeight
 
-    lda zScreenCol                              ; see if it's an even or odd sceeen sub-column
+    lda zScreenCol                              ; see if it's an even or odd screen sub-column
     and #$01
     beq evenScreen
 
@@ -558,7 +558,7 @@ draw:
     lda #NUKE_HEIGHT
     sta zaDrawSprHeight
 
-    lda zScreenCol                              ; see if it's an even or odd sceeen sub-column
+    lda zScreenCol                              ; see if it's an even or odd screen sub-column
     and #$01
     beq evenScreen
 
@@ -633,7 +633,7 @@ draw:
     lda #MONSTER_HEIGHT
     sta zaDrawSprHeight
 
-    lda zScreenCol                              ; see if it's an even or odd sceeen sub-column
+    lda zScreenCol                              ; see if it's an even or odd screen sub-column
     and #$01
     beq evenScreen
 
@@ -989,7 +989,7 @@ explode:
     lda #EXPLOSION_HEIGHT
     sta zaDrawSprHeight
 
-    lda zScreenCol                              ; see if it's an even or odd sceeen sub-column
+    lda zScreenCol                              ; see if it's an even or odd screen sub-column
     and #$01
     beq evenScreen
 

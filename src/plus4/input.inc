@@ -63,7 +63,7 @@
     and #<(~KEY_RIGHT)
     sta rawInput
     lda key
-:   bit Bit3Mask                                ; DGJL                                                                        ;
+:   bit Bit3Mask                                ; DGJL
     bne :+
     lda rawInput
     and #<(~KEY_UP)
@@ -223,7 +223,7 @@ preLeft:
     lda rawInput                                ; no horizontal movement so process horiz joystick
 
 left:
-	bit Bit3Mask                                ; left sets this bit
+    bit Bit3Mask                                ; left sets this bit
     bne right                                   ; not set see if right is set
     ldx playerShipX                             ; the ship should move left
     dex                                         ; move left one column
@@ -251,7 +251,7 @@ preBomb:
     lda rawInput
 
 bomb:
-	bit Bit8Mask                                ; Button_A = bomb
+    bit Bit8Mask                                ; Button_A = bomb
     bne fire
     lda lastInput                               ; debounce the key for single shot
     and rawEOR
@@ -284,7 +284,7 @@ nobomb:
     lda rawInput
 
 fire:
-	bit Bit7Mask                                ; Button_B = fire
+    bit Bit7Mask                                ; Button_B = fire
     bne pauseKey
     lda fireCoolDown
     bne pauseKey
@@ -341,7 +341,7 @@ joyDone:
     sta rawEOR                                  ; and save this state as the key state
 
  Button_B:
- 	bit Bit7Mask                               ; Button_B
+    bit Bit7Mask                                ; Button_B
     beq Button_A
     lda #AUDIO_UI_TICK                          ; make a sound
     sta audioFrame
@@ -359,7 +359,7 @@ radar:
     lda rawEOR                                  ; no horizontal movement so process horiz joystick
 
 Button_A:
-	bit Bit8Mask                                ; Button_A
+    bit Bit8Mask                                ; Button_A
     beq up
     lda #AUDIO_UI_TICK                          ; make a sound
     sta audioFrame
@@ -399,7 +399,7 @@ down:
     lda rawEOR                                  ; no horizontal movement so process horiz joystick
 
 left:
-	bit Bit3Mask                                ; left sets this bit
+    bit Bit3Mask                                ; left sets this bit
     beq right                                   ; not set see if right is set
     jsr editGameWorldLeft
     lda rawEOR                                  ; no horizontal movement so process horiz joystick

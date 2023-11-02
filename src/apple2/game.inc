@@ -168,7 +168,7 @@ win:
     lda #XSIZE-1                                ; place where terrain will start drawing (right hand)
     sta terrainOrigin
 
-    lda #AUDIO_MOTOR_PLAY                       ; Init th eaudio-frame with the engine
+    lda #AUDIO_MOTOR_PLAY                       ; Init the audio-frame with the engine
     sta audioFrame
 
     lda #$ff 

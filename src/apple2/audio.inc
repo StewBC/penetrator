@@ -26,7 +26,7 @@ makeSounds:
     bit Bit5Mask                                ; AUDIO_EXPLOSION
     bne explosion
 
-    bit Bit8432Mask                             ; AUDIO_ENGINE - Not that bit 8 is erroneusly checked
+    bit Bit8432Mask                             ; AUDIO_ENGINE - Not that bit 8 is erroneously checked
     bne engine                                  ; only because I didn't want to make a new constant
 
     bit Bit1Mask                                ; AUDIO_UI_TICK
