@@ -10,7 +10,7 @@
 
 # Space or comma separated list of cc65 supported target platforms to build for.
 # Default: c64 (lowercase!)
-TARGETS := cx16 apple2 plus4
+TARGETS := cx16 apple2 plus4 c64
 
 # Name of the final, single-file executable.
 # Default: name of the current dir with target name appended
@@ -45,6 +45,7 @@ endif
 $(NAME).apple2: LDFLAGS += 
 $(NAME).cx16: LDFLAGS += 
 $(NAME).plus4: LDFLAGS += 
+$(NAME).c64: LDFLAGS +=
 
 # Path to the directory containing C and ASM sources.
 # Default: src
@@ -172,15 +173,15 @@ c64_EMUCMD := $(VICE_HOME)x64sc -autostart $(PROGRAM).c64
 c128_EMUCMD := $(VICE_HOME)x128 -kernal kernal -VICIIdsize -autoload
 vic20_EMUCMD := $(VICE_HOME)xvic -kernal kernal -VICdsize -autoload
 pet_EMUCMD := $(VICE_HOME)xpet -Crtcdsize -autoload
-plus4_EMUCMD := $(VICE_HOME)xplus4.exe -TEDdsize -autostart $(PROGRAM).plus4
+plus4_EMUCMD := $(VICE_HOME)xplus4 -TEDdsize -autostart $(PROGRAM).plus4
 # So far there is no x16 emulator in VICE (why??) so we have to use xplus4 with -memsize option
 c16_EMUCMD := $(VICE_HOME)xplus4 -ramsize 16 -TEDdsize -autoload
 cbm510_EMUCMD := $(VICE_HOME)xcbm2 -model 510 -VICIIdsize -autoload
 cbm610_EMUCMD := $(VICE_HOME)xcbm2 -model 610 -Crtcdsize -autoload
 atari_EMUCMD := $(ATARI_HOME)Altirra64 /defprofile:800 /disk 
 cx16_EMUCMD := $(CX16_HOME)x16emu -run -prg $(PROGRAM).cx16
-apple2_EMUCMD := $(APPLEWIN_HOME)AppleWin.exe -d1 $(PROGRAM).dsk
-atmos_EMUCMD := $(ORIC_HOME)Oricutron.exe -t 
+apple2_EMUCMD := $(APPLEWIN_HOME)AppleWin -d1 $(PROGRAM).dsk
+atmos_EMUCMD := $(ORIC_HOME)Oricutron -t
 
 ifeq ($(EMUCMD),)
   EMUCMD = $($(CC65TARGET)_EMUCMD)
