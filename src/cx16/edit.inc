@@ -286,7 +286,7 @@ missile:
     zaFontH      = zTemp5                       ; internal - point at the character memory Hi
     zaFontOffset = zTemp6                       ; 0-15 - index from zaFont
 
-    print textEditDnArrow, playerShipX, 0, #$ff ; redraw arrow to fix out of top cursor overwrite
+    print textEditDnArrow, playerShipX, #0, #$ff; redraw arrow to fix out of top cursor overwrite
 
     lda #$10                                    ; stride of 1
     sta VERA::ADDR + 2                          ; HI

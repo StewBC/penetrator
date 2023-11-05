@@ -18,7 +18,7 @@
 .segment "CODE"
 
 ;-----------------------------------------------------------------------------
-jmp main                                        ; This ends up at $080d (sys 2061's target)
+jmp main                                        ; This ends up at $100D (sys 4109)
 
 ;-----------------------------------------------------------------------------
 .include "plus4.inc"                            ; Commodore Plus4 locations from cc65

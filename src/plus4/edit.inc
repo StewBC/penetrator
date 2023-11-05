@@ -322,7 +322,7 @@ missile:
     lda times8H,y
     sta zScreenColH
 
-    print textEditDnArrow, xPos, 0              ; redraw arrow to fix out of top cursor overwrite
+    print textEditDnArrow, xPos, #0             ; redraw arrow to fix out of top cursor overwrite
 
     lda #$87                                    ; cursor symbol
     ldy #0
