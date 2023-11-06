@@ -94,7 +94,6 @@
 ;-----------------------------------------------------------------------------
 .proc saveHighScores
 
-:jmp:-
     jsr setHighScoreFileNames                   ; set the name
 
     lda #<scoresTable                           ; set the location
